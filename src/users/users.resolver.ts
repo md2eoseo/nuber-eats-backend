@@ -22,30 +22,18 @@ export class UserResolver {
   async createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
-    try {
-      const { ok, error } = await this.userService.createAccount(
-        createAccountInput,
-      );
-      return { ok, error };
-    } catch (error) {
-      return { ok: false, error };
-    }
+    return this.userService.createAccount(createAccountInput);
   }
 
   @Mutation((returns) => LoginOutput)
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
-    try {
-      const { ok, error, token } = await this.userService.login(loginInput);
-      return { ok, error, token };
-    } catch (error) {
-      return { ok: false, error };
-    }
+    return this.userService.login(loginInput);
   }
 
   @UseGuards(AuthGuard)
   @Query((returns) => User)
-  me(@AuthUser() lUser: User) {
-    return lUser;
+  me(@AuthUser() authUser: User) {
+    return authUser;
   }
 
   @UseGuards(AuthGuard)
@@ -53,15 +41,7 @@ export class UserResolver {
   async userProfile(
     @Args() userProfileInput: UserProfileInput,
   ): Promise<UserProfileOutput> {
-    try {
-      const user = await this.userService.findById(userProfileInput.userId);
-      if (!user) {
-        return { ok: false, error: 'User Not Found' };
-      }
-      return { ok: true, user };
-    } catch (error) {
-      return { ok: false, error };
-    }
+    return this.userService.findById(userProfileInput.userId);
   }
 
   @UseGuards(AuthGuard)
@@ -70,23 +50,13 @@ export class UserResolver {
     @AuthUser() authUser: User,
     @Args('input') editProfileInput: EditProfileInput,
   ): Promise<EditProfileOutput> {
-    try {
-      await this.userService.editProfile(authUser.id, editProfileInput);
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, error };
-    }
+    return this.userService.editProfile(authUser.id, editProfileInput);
   }
 
   @Mutation((returns) => VerifyEmailOutput)
   async verifyEmail(
     @Args('input') { code }: VerifyEmailInput,
   ): Promise<VerifyEmailOutput> {
-    try {
-      await this.userService.verifyEmail(code);
-      return { ok: true };
-    } catch (error) {
-      return { ok: false, error };
-    }
+    return this.userService.verifyEmail(code);
   }
 }
