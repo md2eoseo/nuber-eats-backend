@@ -46,7 +46,7 @@ export class UserService {
       this.mailService.sendVerificationEmail(user.email, verification.code);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: "Couldn't create account" };
+      return { ok: false, error: 'Could not create account' };
     }
   }
 
@@ -76,21 +76,19 @@ export class UserService {
         ok: true,
         token,
       };
-    } catch (error) {
+    } catch (e) {
       return {
         ok: false,
-        error,
+        error: "Can't log user in",
       };
     }
   }
 
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOne({ id });
-      if (user) {
-        return { ok: true, user };
-      }
-    } catch (error) {
+      const user = await this.users.findOneOrFail({ id });
+      return { ok: true, user };
+    } catch (e) {
       return { ok: false, error: 'User Not Found' };
     }
   }
@@ -104,6 +102,7 @@ export class UserService {
       if (email) {
         user.email = email;
         user.verified = false;
+        await this.verifications.delete({ user: { id: user.id } });
         const verification = await this.verifications.save(
           this.verifications.create({ user }),
         );
@@ -115,7 +114,7 @@ export class UserService {
       await this.users.save(user);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: "Couldn't edit profile" };
+      return { ok: false, error: 'Could not edit profile' };
     }
   }
 
@@ -131,9 +130,9 @@ export class UserService {
         await this.verifications.delete(verification.id);
         return { ok: true };
       }
-      throw new Error();
-    } catch (e) {
       return { ok: false, error: 'Verification not found' };
+    } catch (e) {
+      return { ok: false, error: 'Could not verify email' };
     }
   }
 }
