@@ -10,7 +10,7 @@ import { Category } from './category.entity';
 @Entity()
 export class Restaurant extends CoreEntity {
   @Field((type) => String)
-  @Column()
+  @Column({ unique: true })
   @IsString()
   name: string;
 
@@ -19,12 +19,12 @@ export class Restaurant extends CoreEntity {
   @IsString()
   coverImg: string;
 
-  @Field((type) => String)
+  @Field((type) => String, { defaultValue: 'Seoul' })
   @Column()
   @IsString()
   address: string;
 
-  @Field((type) => Category)
+  @Field((type) => Category, { nullable: true })
   @ManyToOne((type) => Category, (category) => category.restaurants, {
     nullable: true,
     onDelete: 'SET NULL',
@@ -32,9 +32,6 @@ export class Restaurant extends CoreEntity {
   category: Category;
 
   @Field((type) => User)
-  @ManyToOne((type) => User, (user) => user.restaurants, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
+  @ManyToOne((type) => User, (user) => user.restaurants)
   owner: User;
 }
