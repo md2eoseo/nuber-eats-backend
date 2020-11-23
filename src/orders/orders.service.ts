@@ -13,7 +13,7 @@ export class OrderService {
 
   async createOrder(
     customer: User,
-    { dishes }: CreateOrderInput,
+    { items }: CreateOrderInput,
   ): Promise<CreateOrderOutput> {
     try {
       // const newOrder = await this.orders.create({customer, dishes})
