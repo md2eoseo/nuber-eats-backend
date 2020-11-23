@@ -5,12 +5,14 @@ import {
   Query,
   ResolveField,
   Parent,
+  Int,
 } from '@nestjs/graphql';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { Role } from 'src/auth/role.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
 import { CategoryInput, CategoryOutput } from './dtos/category.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import {
   CreateRestaurantInput,
   CreateRestaurantOutput,
@@ -30,6 +32,7 @@ import {
   SearchRestaurantOutput,
 } from './dtos/search-restaurant.dto';
 import { Category } from './entities/category.entity';
+import { Dish } from './entities/dish.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { RestaurantService } from './restaurants.service';
 
@@ -40,11 +43,11 @@ export class RestaurantResolver {
   @Mutation((returns) => CreateRestaurantOutput)
   @Role(['Owner'])
   async createRestaurant(
-    @AuthUser() authUser: User,
+    @AuthUser() owner: User,
     @Args('input') createRestaurantInput: CreateRestaurantInput,
   ): Promise<CreateRestaurantOutput> {
     return this.restaurantService.createRestaurant(
-      authUser,
+      owner,
       createRestaurantInput,
     );
   }
@@ -75,7 +78,7 @@ export class RestaurantResolver {
 export class CategoryResolver {
   constructor(private readonly restaurantService: RestaurantService) {}
 
-  @ResolveField((type) => Number)
+  @ResolveField((type) => Int)
   restaurantCount(@Parent() category: Category): Promise<number> {
     return this.restaurantService.countRestaurants(category);
   }
@@ -111,5 +114,19 @@ export class CategoryResolver {
     @Args('input') searchRestaurantInput: SearchRestaurantInput,
   ): Promise<SearchRestaurantOutput> {
     return this.restaurantService.searchRestaurantByName(searchRestaurantInput);
+  }
+}
+
+@Resolver((of) => Dish)
+export class DishResolver {
+  constructor(private readonly restaurantService: RestaurantService) {}
+
+  @Mutation((returns) => CreateDishOutput)
+  @Role(['Owner'])
+  createDish(
+    @AuthUser() owner: User,
+    @Args('input') createDishInput: CreateDishInput,
+  ): Promise<CreateDishOutput> {
+    return this.restaurantService.createDish(owner, createDishInput);
   }
 }
