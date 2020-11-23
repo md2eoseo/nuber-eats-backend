@@ -178,7 +178,9 @@ export class RestaurantService {
     restaurantId,
   }: RestaurantInput): Promise<RestaurantOutput> {
     try {
-      const restaurant = await this.restaurants.findOne(restaurantId);
+      const restaurant = await this.restaurants.findOne(restaurantId, {
+        relations: ['menu'],
+      });
       if (!restaurant) {
         return { ok: false, error: 'Restaurant not found' };
       }
@@ -218,7 +220,6 @@ export class RestaurantService {
     createDishInput: CreateDishInput,
   ): Promise<CreateDishOutput> {
     try {
-      const newDish = this.dishes.create(createDishInput);
       const restaurant = await this.restaurants.findOne(
         createDishInput.restaurantId,
       );
@@ -231,7 +232,7 @@ export class RestaurantService {
           error: 'You can only create dish in your restaurant',
         };
       }
-      newDish.restaurant = restaurant;
+      const newDish = this.dishes.create({ ...createDishInput, restaurant });
       await this.dishes.save(newDish);
       return { ok: true };
     } catch (e) {
@@ -261,7 +262,7 @@ export class RestaurantService {
       ]);
       return { ok: true };
     } catch (e) {
-      return { ok: false, error: e };
+      return { ok: false, error: 'Could not edit dish' };
     }
   }
 
