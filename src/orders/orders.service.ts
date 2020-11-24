@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PubSub } from 'graphql-subscriptions';
 import {
   NEW_COOKED_ORDER,
+  NEW_ORDER_UPDATE,
   NEW_PENDING_ORDER,
   PUB_SUB,
 } from 'src/common/common.constants';
@@ -152,6 +153,7 @@ export class OrderService {
     if (user.role === UserRole.Client && order.customerId !== user.id) {
       canSee = false;
     }
+    console.log(user.role, user.id, order.driverId);
     if (user.role === UserRole.Delivery && order.driverId !== user.id) {
       canSee = false;
     }
@@ -206,6 +208,9 @@ export class OrderService {
           });
         }
       }
+      await this.pubSub.publish(NEW_ORDER_UPDATE, {
+        orderUpdates: { ...order },
+      });
       return { ok: true };
     } catch (e) {
       return { ok: false, error: 'Could not edit order' };
