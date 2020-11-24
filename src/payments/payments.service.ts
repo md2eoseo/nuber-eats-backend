@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cron } from '@nestjs/schedule';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { LessThan, Repository } from 'typeorm';
 import {
   CreatePaymentInput,
   CreatePaymentOutput,
@@ -33,6 +34,11 @@ export class PaymentService {
           error: 'You are not allowed to create payment',
         };
       }
+      restaurant.isPromoted = true;
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+      restaurant.promotedUntil = date;
+      this.restaurants.save(restaurant);
       await this.payments.save(
         this.payments.create({ transactionId, user: owner, restaurant }),
       );
@@ -52,5 +58,18 @@ export class PaymentService {
     } catch (e) {
       return { ok: false, error: 'Could not get payments' };
     }
+  }
+
+  @Cron('*/2 * * * * *')
+  async checkPromotedRestaurants() {
+    const restaurants = await this.restaurants.find({
+      isPromoted: true,
+      promotedUntil: LessThan(new Date()),
+    });
+    restaurants.forEach(async (restaurant) => {
+      restaurant.isPromoted = false;
+      restaurant.promotedUntil = null;
+      await this.restaurants.save(restaurant);
+    });
   }
 }

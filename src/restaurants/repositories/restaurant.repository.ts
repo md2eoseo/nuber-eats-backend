@@ -13,6 +13,9 @@ export class RestaurantRepository extends Repository<Restaurant> {
       where,
       take: PAGE_SIZE,
       skip: (page - 1) * PAGE_SIZE,
+      order: {
+        isPromoted: 'DESC',
+      },
     });
     return [restaurants, totalResults];
   }
