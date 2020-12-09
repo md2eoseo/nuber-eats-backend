@@ -98,7 +98,7 @@ export class CategoryResolver {
   }
 
   @Query((returns) => RestaurantsOutput)
-  retaurants(
+  restaurants(
     @Args('input') restaurantsInput: RestaurantsInput,
   ): Promise<RestaurantsOutput> {
     return this.restaurantService.allRestaurants(restaurantsInput);
