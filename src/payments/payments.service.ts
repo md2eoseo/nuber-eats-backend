@@ -60,7 +60,7 @@ export class PaymentService {
     }
   }
 
-  @Cron('*/2 * * * * *')
+  // @Cron('*/2 * * * * *')
   async checkPromotedRestaurants() {
     const restaurants = await this.restaurants.find({
       isPromoted: true,

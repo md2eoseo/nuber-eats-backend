@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PAGE_SIZE } from 'src/common/common.constants';
 import { User } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dtos/all-categories.dto';
@@ -29,8 +30,6 @@ import { Category } from './entities/category.entity';
 import { Dish } from './entities/dish.entity';
 import { CategoryRepository } from './repositories/category.repository';
 import { RestaurantRepository } from './repositories/restaurant.repository';
-
-const PAGE_SIZE = 5;
 
 @Injectable()
 export class RestaurantService {

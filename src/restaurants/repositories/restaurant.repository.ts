@@ -1,7 +1,6 @@
+import { PAGE_SIZE } from 'src/common/common.constants';
 import { EntityRepository, Repository } from 'typeorm';
 import { Restaurant } from '../entities/restaurant.entity';
-
-const PAGE_SIZE = 5;
 
 @EntityRepository(Restaurant)
 export class RestaurantRepository extends Repository<Restaurant> {
